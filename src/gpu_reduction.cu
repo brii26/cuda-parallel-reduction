@@ -3,21 +3,14 @@
 
 static constexpr int BLOCK_SIZE = 256;
 
-// ── Kernel ───────────────────────────────────────────────────────────────────
-//
-// Each block covers 2*BLOCK_SIZE consecutive elements.
-// Threads beyond n contribute 0 (identity for addition).
-// A single __syncthreads() barrier guards each halving step.
-
-__global__ void reduce_kernel(const float* __restrict__ input,
-                               float* __restrict__ output, int n)
-{
+// Kernel
+__global__ void reduce_kernel(const float* __restrict__ input,float* __restrict__ output, int n) {
     __shared__ float sdata[BLOCK_SIZE];
 
     const int tid = threadIdx.x;
     const int idx = blockIdx.x * blockDim.x * 2 + tid;
 
-    const float a = (idx              < n) ? input[idx]              : 0.f;
+    const float a = (idx < n) ? input[idx] : 0.f;
     const float b = (idx + BLOCK_SIZE < n) ? input[idx + BLOCK_SIZE] : 0.f;
     sdata[tid] = a + b;
     __syncthreads();
@@ -30,8 +23,7 @@ __global__ void reduce_kernel(const float* __restrict__ input,
     if (tid == 0) output[blockIdx.x] = sdata[0];
 }
 
-// ── Public wrapper ───────────────────────────────────────────────────────────
-
+// Public wrapper
 float gpu_reduce(const float* h_input, int n, TimingResult& t) {
     const int numBlocks = (n + BLOCK_SIZE * 2 - 1) / (BLOCK_SIZE * 2);
 
@@ -43,9 +35,7 @@ float gpu_reduce(const float* h_input, int n, TimingResult& t) {
     for (auto& e : ev) CUDA_CHECK(cudaEventCreate(&e));
 
     CUDA_CHECK(cudaEventRecord(ev[0]));
-    CUDA_CHECK(cudaMemcpy(d_input, h_input,
-                          static_cast<size_t>(n) * sizeof(float),
-                          cudaMemcpyHostToDevice));
+    CUDA_CHECK(cudaMemcpy(d_input, h_input, static_cast<size_t>(n) * sizeof(float), cudaMemcpyHostToDevice));
     CUDA_CHECK(cudaEventRecord(ev[1]));
 
     reduce_kernel<<<numBlocks, BLOCK_SIZE>>>(d_input, d_partial, n);
@@ -53,9 +43,7 @@ float gpu_reduce(const float* h_input, int n, TimingResult& t) {
     CUDA_CHECK(cudaEventRecord(ev[2]));
 
     std::vector<float> h_partial(numBlocks);
-    CUDA_CHECK(cudaMemcpy(h_partial.data(), d_partial,
-                          static_cast<size_t>(numBlocks) * sizeof(float),
-                          cudaMemcpyDeviceToHost));
+    CUDA_CHECK(cudaMemcpy(h_partial.data(), d_partial, static_cast<size_t>(numBlocks) * sizeof(float), cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaEventRecord(ev[3]));
     CUDA_CHECK(cudaEventSynchronize(ev[3]));
 
@@ -68,7 +56,7 @@ float gpu_reduce(const float* h_input, int n, TimingResult& t) {
     CUDA_CHECK(cudaFree(d_input));
     CUDA_CHECK(cudaFree(d_partial));
 
-    // Final accumulation on host (CPU loop over per-block partial sums)
+    // sum partials on CPU
     float total = 0.f;
     for (int i = 0; i < numBlocks; ++i) total += h_partial[i];
     return total;

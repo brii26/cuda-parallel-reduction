@@ -2,8 +2,5 @@
 
 #include <vector>
 
-/**
- * Generate n random floats in [0, 1) using a fixed seed.
- * Using the same seed guarantees identical data across serial and parallel runs.
- */
+// uniform random floats in [0,1), fixed seed for reproducibility
 std::vector<float> generate_data(int n, unsigned seed = 42);

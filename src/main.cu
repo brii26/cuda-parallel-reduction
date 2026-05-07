@@ -12,8 +12,7 @@
 static constexpr int NUM_RUNS         = 5;
 static constexpr float REL_ERR_LIMIT  = 1e-2f;
 
-// ── Benchmark helpers ────────────────────────────────────────────────────────
-
+// Benchmark helpers
 struct BenchResult {
     double cpu_mean_ms, cpu_std_ms;
     double h2d_mean_ms, kernel_mean_ms, d2h_mean_ms;
@@ -25,7 +24,7 @@ struct BenchResult {
 static BenchResult run_benchmark(int n) {
     const auto data = generate_data(n);
 
-    // Warm-up: amortises CUDA context init, not recorded
+    // warm-up, not recorded
     {
         TimingResult tw;
         cpu_reduce(data.data(), n);
@@ -89,10 +88,8 @@ static void write_csv_row(FILE* f, int n, const BenchResult& r) {
             r.speedup);
 }
 
-// ── Entry point ──────────────────────────────────────────────────────────────
-
+// Entry point
 int main() {
-    // Print device info
     cudaDeviceProp prop;
     CUDA_CHECK(cudaGetDeviceProperties(&prop, 0));
     printf("Device : %s  |  %d SMs  |  %zu KB shared/block  |  CUDA %d.%d\n\n",

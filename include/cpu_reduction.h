@@ -1,4 +1,4 @@
 #pragma once
 
-/** Sum all n elements of arr on the CPU (sequential loop). */
+// sequential sum, used as ground truth
 float cpu_reduce(const float* arr, int n);
