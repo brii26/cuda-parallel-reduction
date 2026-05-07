@@ -9,7 +9,11 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
+import os
+
 CSV = "results.csv"
+OUT_DIR = "output"
+os.makedirs(OUT_DIR, exist_ok=True)
 
 try:
     df = pd.read_csv(CSV)
@@ -19,7 +23,7 @@ except FileNotFoundError:
 
 n = df["n"].values
 
-# ── Grafik 1: n vs waktu (log-log) ──────────────────────────────────────────
+# Grafik 1: n vs waktu (log-log)
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.errorbar(n, df["cpu_mean_ms"], yerr=df["cpu_std_ms"],
             marker="o", label="Serial (CPU)", linewidth=1.8, capsize=4)
@@ -34,11 +38,11 @@ ax.legend(fontsize=11)
 ax.grid(True, which="both", linestyle="--", alpha=0.5)
 ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{int(v):,}"))
 plt.tight_layout()
-plt.savefig("timing_comparison.png", dpi=150)
+plt.savefig(os.path.join(OUT_DIR, "timing_comparison.png"), dpi=150)
 print("Saved timing_comparison.png")
 plt.close()
 
-# ── Grafik 2: n vs speedup ───────────────────────────────────────────────────
+# Grafik 2: n vs speedup
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.plot(n, df["speedup"], marker="^", color="tab:green",
         linewidth=1.8, markersize=8, label="Speedup")
@@ -51,11 +55,11 @@ ax.legend(fontsize=11)
 ax.grid(True, which="both", linestyle="--", alpha=0.5)
 ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{int(v):,}"))
 plt.tight_layout()
-plt.savefig("speedup.png", dpi=150)
+plt.savefig(os.path.join(OUT_DIR, "speedup.png"), dpi=150)
 print("Saved speedup.png")
 plt.close()
 
-# ── Grafik 3: stacked bar breakdown GPU ─────────────────────────────────────
+# Grafik 3: stacked bar breakdown GPU
 labels = [f"{v:,}" for v in n]
 h2d    = df["h2d_mean_ms"].values
 kernel = df["kernel_mean_ms"].values
@@ -76,6 +80,6 @@ ax.set_title("Breakdown Waktu GPU per Komponen", fontsize=13)
 ax.legend(fontsize=11)
 ax.grid(axis="y", linestyle="--", alpha=0.5)
 plt.tight_layout()
-plt.savefig("gpu_breakdown.png", dpi=150)
+plt.savefig(os.path.join(OUT_DIR, "gpu_breakdown.png"), dpi=150)
 print("Saved gpu_breakdown.png")
 plt.close()
