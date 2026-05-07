@@ -25,7 +25,7 @@ struct BenchResult {
 static BenchResult run_benchmark(int n) {
     const auto data = generate_data(n);
 
-    // Warm-up — amortises CUDA context init, not recorded
+    // Warm-up: amortises CUDA context init, not recorded
     {
         TimingResult tw;
         cpu_reduce(data.data(), n);
