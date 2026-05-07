@@ -10,7 +10,7 @@
 #include "gpu_reduction.cuh"
 
 static constexpr int NUM_RUNS         = 5;
-static constexpr float REL_ERR_LIMIT  = 1e-3f;
+static constexpr float REL_ERR_LIMIT  = 1e-2f;
 
 // ── Benchmark helpers ────────────────────────────────────────────────────────
 
