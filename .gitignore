@@ -1,0 +1,6 @@
+build/
+reduction
+results.csv
+*.png
+*.o
+*.d
