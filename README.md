@@ -14,15 +14,13 @@ Benchmarking serial CPU reduction vs parallel GPU reduction (CUDA) on float arra
 ## Build
 
 ```bash
-make ARCH=sm_86    # adjust to your GPU arch
+make ARCH=sm_86
 ```
-
-Find your arch with `nvidia-smi --query-gpu=compute_cap --format=csv` or check [here](https://developer.nvidia.com/cuda-gpus).
 
 ## Run
 
 ```bash
-./reduction              # outputs results.csv
+./reduction    			          # outputs results.csv
 python3 scripts/plot_results.py   # generates PNG plots
 ```
 
